@@ -1,0 +1,6 @@
+settings.py
+__pycache__
+cache
+tests
+venv3
+index.html
