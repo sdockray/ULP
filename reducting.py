@@ -156,20 +156,30 @@ def get_transcript(docId, ignore_cache=False):
         return {}
 
 
-def get_transcript_list():
-    # @TODO: This doesn't work, so figure it out
-    url = config['DEFAULT_PROD'] + "/"
-    response = requestsX.get(
-        url,
-        headers=request_headers,
-        cookies=cookies_jar
-    )
-    print("Loading transcript list from:", url)
-    if response.status_code == 200:
-        return response.text
+def get_transcript_list(ignore_cache=False):
+    transcript_loc = os.path.join(config['CACHE_DIR'], config['TRANSCRIPTS_DIR'], "list.json")
+    transcripts = {}
+    if not ignore_cache and os.path.exists(transcript_loc):
+        print("Transcript list already exists in cache")
+        with open(transcript_loc, 'r') as f:
+            transcripts = json.load(f)
     else:
-        print("Failed to get transcript list:", response.status_code)
-        return {}
+        url = config['DEFAULT_PROD'] + "/userdb"
+        response = requestsX.get(
+            url,
+            headers=request_headers,
+            cookies=cookies_jar
+        )
+        print("Loading transcript list from:", url)
+        if response.status_code == 200:
+            with open(transcript_loc, 'w') as f:
+                f.write(response.text)
+                transcripts = json.loads(response.text)
+        else:
+            print("Failed to get transcript list:", response.status_code)
+            return {}
+    # print([transcripts['db']['project'][t] for t in transcripts['db']['project']])
+    return {id:transcripts['db']['doc'][id]['title'] for id in transcripts['db']['doc']}
 
 
 def get_audio_for_transcript(transcript_id):
@@ -194,7 +204,12 @@ def get_audio_for_transcript(transcript_id):
 def get_transcript_info(transcript_id):
     transcript = get_transcript(transcript_id)
     num_segments = len(transcript['segments'])
-    speakers = [s['speaker_name'] for s in transcript['segments']]
+    speakers = []
+    for s in transcript['segments']:
+        if 'speaker_name' in s:
+            speakers.append(s['speaker_name'])
+        elif 'speaker_id' in s:
+            speakers.append(s['speaker_id'])
     speakers = list(set(speakers))
     return {
         'num_segments': num_segments,
@@ -207,7 +222,10 @@ def load_words(transcript_id, segment_idx=None, speaker_id=None):
     parts = []
     for i, s in enumerate(transcript['segments']):
         include_segment = False
-        if speaker_id and s['speaker_name']==speaker_id:
+        if speaker_id and 'speaker_name' in s and s['speaker_name']==speaker_id:
+            print("Including segment with speaker:", speaker_id)
+            include_segment = True
+        elif speaker_id and 'speaker_id' in s and s['speaker_id']==speaker_id:
             print("Including segment with speaker:", speaker_id)
             include_segment = True
         elif isinstance(segment_idx, list) and i in segment_idx:
@@ -240,5 +258,5 @@ if __name__=="__main__":
     # get_audio_for_transcript('31166f35aa') # Halcyon
     # get_audio_for_transcript('01effe63e9') # Thomas
     # get_audio_for_transcript('ecbf8fb7bf') # Lauren Lee Mccarty
-    get_audio_for_transcript('8491888ee4') # Burroughs
-    # print(get_transcript_list())
+    # get_audio_for_transcript('8491888ee4') # Burroughs
+    print(get_transcript_list())

@@ -5,18 +5,12 @@ sys.path.insert(0, os.path.abspath('..'))
 
 from clint.textui import prompt, puts, colored, validators
 from playlist import write_to_playlist
-from reducting import load_words, get_transcript_info
+from reducting import load_words, get_transcript_info, get_transcript_list
 from language import do_nlp
 from filters import filter_duration, filter_speed, filter_length, filter_letters, filter_phonemes, filter_words, filter_pos, specific_words, make_phrases
 from sorters import alphabetize, by_length, by_speed, by_sound, by_depth_in_sentence
 
 
-transcripts = {
-    '31166f35aa': 'Halcyon Lawrence',
-    '01effe63e9': 'Thomas Stachura',
-    'ecbf8fb7bf': 'Lauren Lee McCarthy',
-    '8491888ee4': 'We See The Future Through The Binoculars Of The People',
-}
 
 
 def apply_transcript(tid):
@@ -150,6 +144,10 @@ def apply_sort(name, words):
 
 if __name__ == '__main__':
     # Include transcripts
+    if '--reload' in sys.argv[1:]:
+        transcripts = get_transcript_list(ignore_cache=True)
+    else:
+        transcripts = get_transcript_list()    
     done_transcripts = False
     words = []
     while not done_transcripts:
