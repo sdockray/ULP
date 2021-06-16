@@ -243,6 +243,15 @@ def load_words(transcript_id, segment_idx=None, speaker_id=None):
     return parts
 
 
+def ensure_cache():
+    if not os.path.exists(config['CACHE_DIR']):
+        print("Creating cache directories")
+        os.makedirs( os.path.join(config['CACHE_DIR'], config['TRANSCRIPTS_DIR']) )
+        os.makedirs( os.path.join(config['CACHE_DIR'], config['AUDIO_DIR']) )
+        os.makedirs( os.path.join(config['CACHE_DIR'], config['MISC_DIR']) )
+    
+
+ensure_cache()
 print("Setting up the requestsX variable for making Reduct calls")
 requestsX = setup_retry()
 
