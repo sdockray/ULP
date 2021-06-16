@@ -77,7 +77,7 @@ def crossfade_cmd(crossfade, files, audio_dir, playlist_filename):
             cf_cmd = "[" + last_padded_idx + "][" + str(i) + "]" + cf_cmd
         cf_parts.append(cf_cmd)
     cmd += ' '.join(cf_parts)
-    cmd += '" ' + playlist_filename + '.mp4 && cd ../../'
+    cmd += '" ' + playlist_filename + '.aac && cd ../../'
     # print(cmd)
     pyperclip.copy(cmd)
 
@@ -93,7 +93,7 @@ def write_to_playlist(parts, playlist_filename, include_pauses=True, include_wor
     playlist_loc = os.path.join(audio_dir, playlist_filename)
     #print("This playlist will have", len(words), "words")
     print("writing playlist for ffmpeg... do the following to build the file:")
-    print("cd " + audio_dir + " && ffmpeg -f concat -safe 0 -i " + playlist_filename + " -c copy " + playlist_filename + ".mp4 && cd ../../")
+    print("cd " + audio_dir + " && ffmpeg -f concat -safe 0 -i " + playlist_filename + " -c copy " + playlist_filename + ".aac && cd ../../")
     playlist_content = ""
     log_content = ""
     files = []

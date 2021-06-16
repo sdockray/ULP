@@ -105,3 +105,18 @@ def make_phrase(words, start_idx, length):
 
 def make_phrases(words, phrase_defs):
     return [make_phrase(words, np[0], np[1]) for np in phrase_defs]
+
+
+def make_pauses(words):
+    pauses = []
+    for i, w in enumerate(words):
+        if i<len(words)-1:
+            if w[2]['end'] < words[i+1][2]['start']:
+                new_wd = {
+                    'word': '<pause>',
+                    'start': w[2]['end'],
+                    'end':  words[i+1][2]['start'],
+                    'phones': []
+                }
+                pauses.append((w[0], w[1], new_wd))
+    return pauses

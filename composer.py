@@ -7,7 +7,7 @@ from clint.textui import prompt, puts, colored, validators
 from playlist import write_to_playlist
 from reducting import load_words, get_transcript_info, get_transcript_list
 from language import do_nlp
-from filters import filter_duration, filter_speed, filter_length, filter_letters, filter_phonemes, filter_words, filter_pos, specific_words, make_phrases
+from filters import filter_duration, filter_speed, filter_length, filter_letters, filter_phonemes, filter_words, filter_pos, specific_words, make_phrases, make_pauses
 from sorters import alphabetize, by_length, by_speed, by_sound, by_depth_in_sentence
 
 
@@ -22,7 +22,7 @@ def apply_transcript(tid):
     if o == "_all":
         return load_words(tid, segment_idx='all')
     elif o == "_index":
-        val = prompt.query("Enter a number between 0 and {0}".format(info['num_segments']))
+        val = prompt.query("Enter a number between 0 and {0}: ".format(info['num_segments']))
         val = [int(v) for v in val.split(',')]
         return load_words(tid, segment_idx=val)
     else:
@@ -104,6 +104,8 @@ def apply_filter(name, words):
     elif name=="make_phrase":
         script = prompt.query("Write a few words, a phrase, a sentence:")
         return specific_words(words, script)
+    elif name=="pauses":
+        return make_pauses(words)
     else:
         puts(colored.red("This isn't a valid filter: {0}".format(name)))
         return words
@@ -181,6 +183,7 @@ if __name__ == '__main__':
             {'selector': 15, 'prompt': 'Keep words', 'return': 'words'},
             {'selector': 16, 'prompt': 'Remove words', 'return': 'words_remove'},
             {'selector': 17, 'prompt': 'Make a phrase', 'return': 'make_phrase'},
+            {'selector': 18, 'prompt': 'Keep only pauses', 'return': 'pauses'},
             # Add more filters here
             {'selector': 'n', 'prompt': 'No more filters', 'return': None},
         ]
